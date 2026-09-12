@@ -1,5 +1,9 @@
 package org.def.fireshare.controller;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.def.fireshare.model.File;
+import org.def.fireshare.service.FileService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -17,21 +21,23 @@ import java.nio.file.StandardCopyOption;
 @RestController
 @RequestMapping("/file")
 public class FileController {
+    private final FileService fileService;
 
-    @PostMapping("/upload")
-    public void fileUpload(@RequestParam("file")MultipartFile file) throws IOException {
-        Path uploadPath = Paths.get("fileStorage");
-        Path filePath = uploadPath.resolve(file.getOriginalFilename());
-
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+    public FileController(FileService fileService) {
+        this.fileService = fileService;
     }
 
-    @GetMapping("/download/{filename}")
-    public ResponseEntity<Resource> fileDownload(@PathVariable String filename) throws MalformedURLException {
-        Path filePath = Paths.get("fileStorage").resolve(filename);
+    @PostMapping("/upload")
+    public ResponseEntity<String> fileUpload(@RequestParam("file")MultipartFile file) {
+        File uploadedFile = fileService.uploadFile(file);
 
-        Resource resource = new UrlResource(filePath.toUri());
+        return ResponseEntity.ok().body("File uploaded successfully, File ID: " + uploadedFile.getId());
+    }
 
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = \"" + filename + "\"").body(resource);
+    @GetMapping("/download/{id}")
+    public ResponseEntity<Resource> fileDownload(@PathVariable Long id) {
+        Resource downloadedFile = fileService.downloadFile(id);
+
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename =\"" + downloadedFile.getFilename() + "\"").body(downloadedFile);
     }
 }
