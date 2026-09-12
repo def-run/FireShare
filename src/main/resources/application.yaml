@@ -2,6 +2,11 @@ spring:
   application:
     name: FireShare
 
+  security:
+    user:
+      name: "Hrishank"
+      password: "Hrish@2006"
+
   datasource:
     url: jdbc:postgresql://localhost:5432/FireShare
     username: postgres
