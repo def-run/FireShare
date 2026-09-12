@@ -4,6 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 fileStorage/
+file-sharing-system-domain-analysis.md
 
 ### STS ###
 .apt_generated
